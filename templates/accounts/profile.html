@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Mi Perfil - {{ crm_name }}{% endblock %}
+{% block page_title %}Mi Perfil{% endblock %}
+{% block page_actions %}<a href="{% url 'accounts:profile_edit' %}" class="btn-secondary">Editar</a>{% endblock %}
+{% block content %}
+<div class="max-w-2xl">
+    <div class="bg-white rounded-xl shadow-sm border p-6">
+        <div class="flex items-center gap-4 mb-6">
+            {% if user.avatar %}<img src="{{ user.avatar.url }}" class="w-16 h-16 rounded-full object-cover" alt="">{% else %}<div class="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xl">{{ user.first_name.0 }}{{ user.last_name.0 }}</div>{% endif %}
+            <div>
+                <h2 class="text-xl font-bold text-gray-800">{{ user.get_full_name }}</h2>
+                <p class="text-sm text-gray-500">{{ user.get_role_display }}</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4 text-sm">
+            <div><span class="text-gray-500">Email:</span> <span class="font-medium">{{ user.email }}</span></div>
+            <div><span class="text-gray-500">Teléfono:</span> <span class="font-medium">{{ user.phone|default:"-" }}</span></div>
+            <div><span class="text-gray-500">Departamento:</span> <span class="font-medium">{{ user.department|default:"-" }}</span></div>
+            <div><span class="text-gray-500">Zona horaria:</span> <span class="font-medium">{{ user.timezone }}</span></div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+# Django Core
+Django>=4.2,<5.0
+djangorestframework>=3.14,<4.0
+django-filter>=23.0
+django-cors-headers>=4.2
+
+# Database (SQLite incluido en Python, no necesita paquete extra)
+
+# Async Tasks
+celery>=5.4
+django-celery-beat>=2.6
+redis>=5.0
+
+# Authentication & Permissions
+djangorestframework-simplejwt>=5.3
+django-guardian>=2.4
+
+# File handling
+Pillow>=10.4
+
+# macOS Calendar & Contact Sync (iCal / vCard nativo)
+vobject>=0.9
+icalendar>=5.0
+
+# Email (Mail.app de Mac vía SMTP)
+
+# AI / ML
+scikit-learn>=1.5
+pandas>=2.2
+numpy>=1.26
+
+# Utilities
+django-environ>=0.11
+django-extensions>=3.2
+django-import-export>=4.0
+django-taggit>=5.0
+whitenoise>=6.7
+gunicorn>=22.0
+django-htmx>=1.18
+
+# macOS Phone (FaceTime/Teléfono vía AppleScript)
+# No requiere paquete externo
+
+# API Documentation
+drf-spectacular>=0.27
+
+# Development
+django-debug-toolbar>=4.4
+factory-boy>=3.3
+pytest-django>=4.8

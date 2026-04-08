@@ -219,7 +219,7 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
-				};
+				}; // set via build settings
 			};
 			buildConfigurationList = F933867869B1F7E37213CF72 /* Build configuration list for PBXProject "TalentoSostenible" */;
 			developmentRegion = en;
@@ -417,10 +417,13 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_BUNDLE_IDENTIFIER = com.talentosostenible.crm;
 				PRODUCT_NAME = "Talento Sostenible";
 				SDKROOT = macosx;
 				SWIFT_VERSION = 5.9;
+				DEVELOPMENT_TEAM = L6VB5SQMZU;
 			};
 			name = Release;
 		};
@@ -443,10 +446,13 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_BUNDLE_IDENTIFIER = com.talentosostenible.crm;
 				PRODUCT_NAME = "Talento Sostenible";
 				SDKROOT = macosx;
 				SWIFT_VERSION = 5.9;
+				DEVELOPMENT_TEAM = L6VB5SQMZU;
 			};
 			name = Debug;
 		};

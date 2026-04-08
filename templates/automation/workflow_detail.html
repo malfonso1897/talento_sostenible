@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}{{ workflow.name }} - {{ crm_name }}{% endblock %}
+{% block page_title %}{{ workflow.name }}{% endblock %}
+{% block page_actions %}<a href="{% url 'automation:workflow_edit' workflow.pk %}" class="btn-secondary">Editar</a>{% endblock %}
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 space-y-6">
+        <div class="bg-white rounded-xl shadow-sm border p-6">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="badge {% if workflow.is_active %}bg-green-100 text-green-700{% else %}bg-gray-100 text-gray-500{% endif %}">{% if workflow.is_active %}Activo{% else %}Inactivo{% endif %}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-4 text-sm">
+                <div><span class="text-gray-500">Disparador:</span> <span class="font-medium">{{ workflow.get_trigger_display }}</span></div>
+                <div><span class="text-gray-500">Acción:</span> <span class="font-medium">{{ workflow.get_action_display }}</span></div>
+                <div><span class="text-gray-500">Ejecuciones:</span> <span class="font-medium">{{ workflow.execution_count }}</span></div>
+                <div><span class="text-gray-500">Última ejecución:</span> <span class="font-medium">{{ workflow.last_executed|date:"d/m/Y H:i"|default:"-" }}</span></div>
+            </div>
+            {% if workflow.description %}<div class="mt-4 pt-4 border-t"><p class="text-sm text-gray-700">{{ workflow.description }}</p></div>{% endif %}
+        </div>
+        <div class="bg-white rounded-xl shadow-sm border">
+            <div class="p-4 border-b"><h3 class="font-semibold text-gray-800">Historial de ejecuciones</h3></div>
+            <div class="divide-y">
+                {% for log in logs %}
+                <div class="p-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm {% if log.success %}text-green-600{% else %}text-red-600{% endif %}">{% if log.success %}Éxito{% else %}Error{% endif %}</span>
+                        <span class="text-xs text-gray-400">{{ log.executed_at|date:"d/m/Y H:i" }}</span>
+                    </div>
+                    {% if log.error_message %}<p class="text-xs text-red-500 mt-1">{{ log.error_message }}</p>{% endif %}
+                </div>
+                {% empty %}<p class="p-4 text-sm text-gray-400">Sin ejecuciones registradas.</p>{% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="space-y-4">
+        <div class="bg-white rounded-xl shadow-sm border p-4">
+            <form method="post" action="{% url 'automation:workflow_toggle' workflow.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="w-full {% if workflow.is_active %}btn-danger{% else %}btn-primary{% endif %}">
+                    {% if workflow.is_active %}Desactivar{% else %}Activar{% endif %}
+                </button>
+            </form>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm border p-4 text-xs text-gray-400 space-y-1">
+            <p>Creado: {{ workflow.created_at|date:"d/m/Y H:i" }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

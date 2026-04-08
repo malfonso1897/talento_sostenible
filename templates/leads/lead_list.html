@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Leads - {{ crm_name }}{% endblock %}
+{% block page_title %}Leads{% endblock %}
+{% block page_actions %}<a href="{% url 'leads:lead_create' %}" class="btn-primary">+ Nuevo Lead</a>{% endblock %}
+{% block content %}
+<div class="bg-white rounded-xl shadow-sm border p-4 mb-6">
+    <form method="get" class="flex flex-wrap gap-4 items-end">
+        <div class="flex-1 min-w-[200px]">
+            <input type="search" name="q" value="{{ search }}" placeholder="Buscar leads..." class="form-input">
+        </div>
+        <select name="status" class="form-input w-auto" onchange="this.form.submit()">
+            <option value="">Todos los estados</option>
+            {% for value, label in status_choices %}
+            <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <select name="source" class="form-input w-auto" onchange="this.form.submit()">
+            <option value="">Todos los orígenes</option>
+            {% for value, label in source_choices %}
+            <option value="{{ value }}" {% if request.GET.source == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+<div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+    <table class="w-full">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Empresa</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Origen</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Score</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Asignado</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y">
+            {% for lead in leads %}
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3"><a href="{% url 'leads:lead_detail' lead.pk %}" class="text-blue-600 hover:underline font-medium">{{ lead.full_name }}</a></td>
+                <td class="px-4 py-3 text-sm text-gray-600">{{ lead.company_name|default:"-" }}</td>
+                <td class="px-4 py-3"><span class="badge {% if lead.status == 'new' %}bg-blue-100 text-blue-700{% elif lead.status == 'qualified' %}bg-green-100 text-green-700{% elif lead.status == 'converted' %}bg-emerald-100 text-emerald-700{% elif lead.status == 'lost' %}bg-red-100 text-red-700{% else %}bg-gray-100 text-gray-700{% endif %}">{{ lead.get_status_display }}</span></td>
+                <td class="px-4 py-3 text-sm text-gray-600">{{ lead.get_source_display|default:"-" }}</td>
+                <td class="px-4 py-3 text-sm font-medium">{{ lead.score }}</td>
+                <td class="px-4 py-3 text-sm text-gray-600">{{ lead.assigned_to|default:"-" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="px-4 py-8 text-center text-gray-400">No se encontraron leads.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

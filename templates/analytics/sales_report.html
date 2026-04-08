@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Informe de Ventas - {{ crm_name }}{% endblock %}
+{% block page_title %}Informe de Ventas{% endblock %}
+{% block page_actions %}
+<form method="get" class="flex gap-2">
+    <select name="period" class="form-input w-auto" onchange="this.form.submit()">
+        <option value="month" {% if period == 'month' %}selected{% endif %}>Mensual</option>
+        <option value="quarter" {% if period == 'quarter' %}selected{% endif %}>Trimestral</option>
+        <option value="year" {% if period == 'year' %}selected{% endif %}>Anual</option>
+    </select>
+</form>
+{% endblock %}
+{% block content %}
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white rounded-xl shadow-sm border p-4">
+        <p class="text-xs text-gray-500 uppercase">Ventas cerradas</p>
+        <p class="text-2xl font-bold text-green-600">{{ total_won|floatformat:0 }}€</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border p-4">
+        <p class="text-xs text-gray-500 uppercase">Deals ganados</p>
+        <p class="text-2xl font-bold text-gray-800">{{ won_count }}</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border p-4">
+        <p class="text-xs text-gray-500 uppercase">Deals perdidos</p>
+        <p class="text-2xl font-bold text-red-600">{{ lost_count }}</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border p-4">
+        <p class="text-xs text-gray-500 uppercase">Tamaño medio</p>
+        <p class="text-2xl font-bold text-gray-800">{{ avg_deal_size|floatformat:0 }}€</p>
+    </div>
+</div>
+<div class="bg-white rounded-xl shadow-sm border">
+    <div class="p-4 border-b"><h3 class="font-semibold text-gray-800">Oportunidades cerradas</h3></div>
+    <table class="w-full">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Empresa</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Importe</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Resultado</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y">
+            {% for opp in closed_deals %}
+            <tr>
+                <td class="px-4 py-3 text-sm font-medium">{{ opp.name }}</td>
+                <td class="px-4 py-3 text-sm text-gray-600">{{ opp.company|default:"-" }}</td>
+                <td class="px-4 py-3 text-sm">{{ opp.amount|floatformat:0 }}€</td>
+                <td class="px-4 py-3"><span class="badge {% if opp.stage == 'closed_won' %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">{{ opp.get_stage_display }}</span></td>
+                <td class="px-4 py-3 text-sm text-gray-600">{{ opp.updated_at|date:"d/m/Y" }}</td>
+            </tr>
+            {% empty %}<tr><td colspan="5" class="px-4 py-4 text-center text-gray-400">Sin datos.</td></tr>{% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

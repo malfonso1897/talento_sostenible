@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Informe de Leads - {{ crm_name }}{% endblock %}
+{% block page_title %}Informe de Leads{% endblock %}
+{% block content %}
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white rounded-xl shadow-sm border p-4">
+        <p class="text-xs text-gray-500 uppercase">Total Leads</p>
+        <p class="text-2xl font-bold text-gray-800">{{ total_leads }}</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border p-4">
+        <p class="text-xs text-gray-500 uppercase">Convertidos</p>
+        <p class="text-2xl font-bold text-green-600">{{ converted }}</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border p-4">
+        <p class="text-xs text-gray-500 uppercase">Tasa conversión</p>
+        <p class="text-2xl font-bold text-indigo-600">{{ conversion_rate|floatformat:1 }}%</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border p-4">
+        <p class="text-xs text-gray-500 uppercase">Score promedio</p>
+        <p class="text-2xl font-bold text-gray-800">{{ avg_score|floatformat:0 }}</p>
+    </div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="bg-white rounded-xl shadow-sm border">
+        <div class="p-4 border-b"><h3 class="font-semibold text-gray-800">Por Estado</h3></div>
+        <div class="p-4">
+            {% for item in by_status %}
+            <div class="flex items-center justify-between py-2">
+                <span class="text-sm text-gray-700">{{ item.status_label }}</span>
+                <span class="text-sm font-medium">{{ item.count }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border">
+        <div class="p-4 border-b"><h3 class="font-semibold text-gray-800">Por Origen</h3></div>
+        <div class="p-4">
+            {% for item in by_source %}
+            <div class="flex items-center justify-between py-2">
+                <span class="text-sm text-gray-700">{{ item.source_label }}</span>
+                <span class="text-sm font-medium">{{ item.count }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

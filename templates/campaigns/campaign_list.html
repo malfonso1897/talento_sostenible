@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Campañas - {{ crm_name }}{% endblock %}
+{% block page_title %}Campañas{% endblock %}
+{% block page_actions %}<a href="{% url 'campaigns:campaign_create' %}" class="btn-primary">+ Nueva Campaña</a>{% endblock %}
+{% block content %}
+<div class="bg-white rounded-xl shadow-sm border p-4 mb-6">
+    <form method="get" class="flex gap-4">
+        <select name="status" class="form-input w-auto" onchange="this.form.submit()">
+            <option value="">Todos los estados</option>
+            {% for value, label in status_choices %}
+            <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <select name="type" class="form-input w-auto" onchange="this.form.submit()">
+            <option value="">Todos los tipos</option>
+            {% for value, label in type_choices %}
+            <option value="{{ value }}" {% if request.GET.type == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for campaign in campaigns %}
+    <a href="{% url 'campaigns:campaign_detail' campaign.pk %}" class="block bg-white rounded-xl shadow-sm border hover:shadow-md transition">
+        <div class="p-5">
+            <div class="flex items-center justify-between mb-3">
+                <span class="badge {% if campaign.status == 'active' %}bg-green-100 text-green-700{% elif campaign.status == 'draft' %}bg-gray-100 text-gray-700{% elif campaign.status == 'completed' %}bg-blue-100 text-blue-700{% else %}bg-red-100 text-red-700{% endif %}">{{ campaign.get_status_display }}</span>
+                <span class="text-xs text-gray-400">{{ campaign.get_campaign_type_display }}</span>
+            </div>
+            <h3 class="font-semibold text-gray-800 mb-2">{{ campaign.name }}</h3>
+            <div class="grid grid-cols-2 gap-2 text-xs text-gray-500">
+                <div>Presupuesto: <span class="font-medium text-gray-700">{{ campaign.budget|floatformat:0 }}€</span></div>
+                <div>ROI: <span class="font-medium {% if campaign.roi > 0 %}text-green-600{% else %}text-red-600{% endif %}">{{ campaign.roi|floatformat:1 }}%</span></div>
+                <div>Miembros: <span class="font-medium text-gray-700">{{ campaign.members_count }}</span></div>
+                <div>Inicio: <span class="font-medium text-gray-700">{{ campaign.start_date|date:"d/m/Y"|default:"-" }}</span></div>
+            </div>
+        </div>
+    </a>
+    {% empty %}
+    <div class="col-span-3 text-center py-12 text-gray-400">No hay campañas.</div>
+    {% endfor %}
+</div>
+{% endblock %}

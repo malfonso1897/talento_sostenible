@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}{{ ticket.subject }} - {{ crm_name }}{% endblock %}
+{% block page_title %}Ticket: {{ ticket.subject }}{% endblock %}
+{% block page_actions %}<a href="{% url 'tickets:ticket_edit' ticket.pk %}" class="btn-secondary">Editar</a>{% endblock %}
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 space-y-6">
+        <div class="bg-white rounded-xl shadow-sm border p-6">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="badge {% if ticket.status == 'open' %}bg-blue-100 text-blue-700{% elif ticket.status == 'in_progress' %}bg-yellow-100 text-yellow-700{% elif ticket.status == 'resolved' %}bg-green-100 text-green-700{% else %}bg-gray-100 text-gray-700{% endif %}">{{ ticket.get_status_display }}</span>
+                <span class="badge {% if ticket.priority == 'critical' %}bg-red-100 text-red-700{% elif ticket.priority == 'high' %}bg-orange-100 text-orange-700{% else %}bg-yellow-100 text-yellow-700{% endif %}">{{ ticket.get_priority_display }}</span>
+                {% if ticket.is_overdue %}<span class="badge bg-red-200 text-red-800">SLA Vencido</span>{% endif %}
+            </div>
+            <div class="grid grid-cols-2 gap-4 text-sm">
+                <div><span class="text-gray-500">Contacto:</span> {% if ticket.contact %}<a href="{% url 'contacts:contact_detail' ticket.contact.pk %}" class="text-blue-600">{{ ticket.contact }}</a>{% else %}-{% endif %}</div>
+                <div><span class="text-gray-500">Canal:</span> {{ ticket.get_channel_display }}</div>
+                <div><span class="text-gray-500">Asignado a:</span> {{ ticket.assigned_to|default:"-" }}</div>
+                <div><span class="text-gray-500">SLA:</span> {{ ticket.sla_deadline|date:"d/m/Y H:i"|default:"-" }}</div>
+            </div>
+            {% if ticket.description %}<div class="mt-4 pt-4 border-t"><p class="text-sm text-gray-700 whitespace-pre-line">{{ ticket.description }}</p></div>{% endif %}
+        </div>
+        <div class="bg-white rounded-xl shadow-sm border">
+            <div class="p-4 border-b"><h3 class="font-semibold text-gray-800">Comentarios</h3></div>
+            <div class="divide-y">
+                {% for comment in comments %}
+                <div class="p-4 {% if comment.is_internal %}bg-yellow-50{% endif %}">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-sm font-medium">{{ comment.created_by|default:"Sistema" }}</span>
+                        <span class="text-xs text-gray-400">{{ comment.created_at|date:"d/m/Y H:i" }}</span>
+                    </div>
+                    {% if comment.is_internal %}<span class="text-xs text-yellow-600 font-medium">Nota interna</span>{% endif %}
+                    <p class="text-sm text-gray-700 mt-1 whitespace-pre-line">{{ comment.content }}</p>
+                </div>
+                {% empty %}<p class="p-4 text-sm text-gray-400">Sin comentarios.</p>{% endfor %}
+            </div>
+            <div class="p-4 border-t">
+                <form method="post" action="{% url 'tickets:ticket_add_comment' ticket.pk %}">
+                    {% csrf_token %}
+                    <textarea name="content" rows="3" class="form-input mb-2" placeholder="Escribe un comentario..."></textarea>
+                    <div class="flex items-center justify-between">
+                        <label class="flex items-center gap-2 text-sm text-gray-600"><input type="checkbox" name="is_internal"> Nota interna</label>
+                        <button type="submit" class="btn-primary">Comentar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border p-4 h-fit text-xs text-gray-400 space-y-1">
+        <p>Creado: {{ ticket.created_at|date:"d/m/Y H:i" }}</p>
+        <p>Modificado: {{ ticket.updated_at|date:"d/m/Y H:i" }}</p>
+    </div>
+</div>
+{% endblock %}

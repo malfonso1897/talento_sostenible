@@ -1,0 +1,26 @@
+<table class="w-full">
+    <thead class="bg-gray-50">
+        <tr>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Empresa</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Etapa</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Importe</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Probabilidad</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cierre</th>
+        </tr>
+    </thead>
+    <tbody class="divide-y">
+        {% for opp in opportunities %}
+        <tr class="hover:bg-gray-50">
+            <td class="px-4 py-3"><a href="{% url 'opportunities:opportunity_detail' opp.pk %}" class="text-blue-600 hover:underline font-medium">{{ opp.name }}</a></td>
+            <td class="px-4 py-3 text-sm text-gray-600">{{ opp.company|default:"-" }}</td>
+            <td class="px-4 py-3"><span class="badge bg-indigo-100 text-indigo-700">{{ opp.get_stage_display }}</span></td>
+            <td class="px-4 py-3 text-sm font-medium">{{ opp.amount|floatformat:0 }}€</td>
+            <td class="px-4 py-3 text-sm">{{ opp.probability }}%</td>
+            <td class="px-4 py-3 text-sm text-gray-600">{{ opp.expected_close_date|date:"d/m/Y"|default:"-" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="px-4 py-8 text-center text-gray-400">No hay oportunidades.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>

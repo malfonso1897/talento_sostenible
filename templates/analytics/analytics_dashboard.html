@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Analítica - {{ crm_name }}{% endblock %}
+{% block page_title %}Panel de Analítica{% endblock %}
+{% block content %}
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white rounded-xl shadow-sm border p-4">
+        <p class="text-xs text-gray-500 uppercase">Pipeline Total</p>
+        <p class="text-2xl font-bold text-gray-800">{{ pipeline_total|floatformat:0 }}€</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border p-4">
+        <p class="text-xs text-gray-500 uppercase">Deals ganados (mes)</p>
+        <p class="text-2xl font-bold text-green-600">{{ won_this_month|floatformat:0 }}€</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border p-4">
+        <p class="text-xs text-gray-500 uppercase">Leads activos</p>
+        <p class="text-2xl font-bold text-blue-600">{{ active_leads }}</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border p-4">
+        <p class="text-xs text-gray-500 uppercase">Conversión leads</p>
+        <p class="text-2xl font-bold text-indigo-600">{{ conversion_rate|floatformat:1 }}%</p>
+    </div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <div class="bg-white rounded-xl shadow-sm border">
+        <div class="p-4 border-b"><h3 class="font-semibold text-gray-800">Pipeline por Etapa</h3></div>
+        <div class="p-4">
+            {% for stage in pipeline_by_stage %}
+            <div class="flex items-center justify-between py-2">
+                <span class="text-sm text-gray-700">{{ stage.stage_label }}</span>
+                <div class="flex items-center gap-2">
+                    <div class="w-32 bg-gray-200 rounded-full h-2"><div class="bg-indigo-500 h-2 rounded-full" style="width: {{ stage.percentage }}%"></div></div>
+                    <span class="text-sm font-medium w-24 text-right">{{ stage.total|floatformat:0 }}€</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border">
+        <div class="p-4 border-b"><h3 class="font-semibold text-gray-800">Leads por Origen</h3></div>
+        <div class="p-4">
+            {% for source in leads_by_source %}
+            <div class="flex items-center justify-between py-2">
+                <span class="text-sm text-gray-700">{{ source.source_label }}</span>
+                <span class="text-sm font-medium">{{ source.count }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<div class="flex flex-wrap gap-3">
+    <a href="{% url 'analytics:sales_report' %}" class="btn-secondary">Informe de Ventas</a>
+    <a href="{% url 'analytics:leads_report' %}" class="btn-secondary">Informe de Leads</a>
+    <a href="{% url 'analytics:activities_report' %}" class="btn-secondary">Informe de Actividades</a>
+    <a href="{% url 'analytics:forecast' %}" class="btn-secondary">Forecast</a>
+</div>
+{% endblock %}

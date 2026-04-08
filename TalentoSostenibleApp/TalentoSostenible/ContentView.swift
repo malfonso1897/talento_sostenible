@@ -1,3 +1,4 @@
+
 import SwiftUI
 
 enum SidebarItem: String, CaseIterable, Identifiable {

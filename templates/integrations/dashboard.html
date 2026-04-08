@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Integraciones macOS - {{ crm_name }}{% endblock %}
+{% block page_title %}Integraciones macOS{% endblock %}
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="bg-white rounded-xl shadow-sm border p-6">
+        <h3 class="font-semibold text-gray-800 mb-3">Calendario</h3>
+        <p class="text-sm text-gray-500 mb-4">Sincronizar actividades con Calendar.app</p>
+        <form method="post" action="{% url 'integrations:sync_calendar' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn-primary w-full">Sincronizar Calendario</button>
+        </form>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border p-6">
+        <h3 class="font-semibold text-gray-800 mb-3">Contactos</h3>
+        <p class="text-sm text-gray-500 mb-4">Sincronizar con Contacts.app</p>
+        <form method="post" action="{% url 'integrations:sync_contacts' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn-primary w-full">Sincronizar Contactos</button>
+        </form>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border p-6">
+        <h3 class="font-semibold text-gray-800 mb-3">Archivos</h3>
+        <p class="text-sm text-gray-500 mb-4">Gestionar archivos locales del CRM</p>
+        <a href="{% url 'integrations:open_finder_root' %}" class="btn-secondary block text-center">Abrir en Finder</a>
+    </div>
+</div>
+{% if sync_logs %}
+<div class="mt-8 bg-white rounded-xl shadow-sm border">
+    <div class="p-4 border-b"><h3 class="font-semibold text-gray-800">Últimas sincronizaciones</h3></div>
+    <div class="divide-y">
+        {% for log in sync_logs %}
+        <div class="p-4 flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium">{{ log.get_service_display }}</p>
+                <p class="text-xs text-gray-400">{{ log.synced_at|date:"d/m/Y H:i" }}</p>
+            </div>
+            <span class="badge {% if log.success %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">{% if log.success %}OK{% else %}Error{% endif %}</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Automatizaciones - {{ crm_name }}{% endblock %}
+{% block page_title %}Automatizaciones{% endblock %}
+{% block page_actions %}<a href="{% url 'automation:workflow_create' %}" class="btn-primary">+ Nuevo Workflow</a>{% endblock %}
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for wf in workflows %}
+    <div class="bg-white rounded-xl shadow-sm border p-5">
+        <div class="flex items-center justify-between mb-3">
+            <a href="{% url 'automation:workflow_detail' wf.pk %}" class="font-semibold text-gray-800 hover:text-blue-600">{{ wf.name }}</a>
+            <form method="post" action="{% url 'automation:workflow_toggle' wf.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="text-xs px-2 py-1 rounded {% if wf.is_active %}bg-green-100 text-green-700{% else %}bg-gray-100 text-gray-500{% endif %}">
+                    {% if wf.is_active %}Activo{% else %}Inactivo{% endif %}
+                </button>
+            </form>
+        </div>
+        <p class="text-sm text-gray-500 mb-3">{{ wf.get_trigger_display }} - {{ wf.get_action_display }}</p>
+        <div class="text-xs text-gray-400 flex justify-between">
+            <span>Ejecuciones: {{ wf.execution_count }}</span>
+            <span>{% if wf.last_executed %}Última: {{ wf.last_executed|date:"d/m H:i" }}{% endif %}</span>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-span-3 text-center py-12 text-gray-400">No hay automatizaciones.</div>
+    {% endfor %}
+</div>
+{% endblock %}

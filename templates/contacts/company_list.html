@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Empresas - {{ crm_name }}{% endblock %}
+{% block page_title %}Empresas{% endblock %}
+{% block page_actions %}<a href="{% url 'contacts:company_create' %}" class="btn-primary">+ Nueva Empresa</a>{% endblock %}
+{% block content %}
+<div class="bg-white rounded-xl shadow-sm border p-4 mb-6">
+    <form method="get" class="flex gap-4">
+        <input type="search" name="q" value="{{ search }}" placeholder="Buscar empresa..." class="form-input flex-1">
+        <button type="submit" class="btn-secondary">Buscar</button>
+    </form>
+</div>
+<div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+    <table class="w-full">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Empresa</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sector</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tamaño</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ciudad</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contactos</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y">
+            {% for company in companies %}
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3"><a href="{% url 'contacts:company_detail' company.pk %}" class="text-blue-600 hover:underline font-medium">{{ company.name }}</a></td>
+                <td class="px-4 py-3 text-sm text-gray-600">{{ company.get_industry_display|default:"-" }}</td>
+                <td class="px-4 py-3 text-sm text-gray-600">{{ company.get_size_display|default:"-" }}</td>
+                <td class="px-4 py-3 text-sm text-gray-600">{{ company.city|default:"-" }}</td>
+                <td class="px-4 py-3 text-sm text-gray-600">{{ company.contacts_count }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="px-4 py-8 text-center text-gray-400">No se encontraron empresas.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

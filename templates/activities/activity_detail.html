@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ activity.subject }} - {{ crm_name }}{% endblock %}
+{% block page_title %}{{ activity.subject }}{% endblock %}
+{% block page_actions %}<a href="{% url 'activities:activity_edit' activity.pk %}" class="btn-secondary">Editar</a>{% endblock %}
+{% block content %}
+<div class="max-w-2xl">
+    <div class="bg-white rounded-xl shadow-sm border p-6 space-y-4">
+        <div class="grid grid-cols-2 gap-4 text-sm">
+            <div><span class="text-gray-500">Tipo:</span> <span class="font-medium">{{ activity.get_activity_type_display }}</span></div>
+            <div><span class="text-gray-500">Fecha:</span> <span class="font-medium">{{ activity.due_date|date:"d/m/Y H:i" }}</span></div>
+            <div><span class="text-gray-500">Duración:</span> <span class="font-medium">{{ activity.duration|default:"-" }} min</span></div>
+            <div><span class="text-gray-500">Estado:</span> {% if activity.is_completed %}<span class="badge bg-green-100 text-green-700">Completada</span>{% else %}<span class="badge bg-yellow-100 text-yellow-700">Pendiente</span>{% endif %}</div>
+            <div><span class="text-gray-500">Contacto:</span> {% if activity.contact %}<a href="{% url 'contacts:contact_detail' activity.contact.pk %}" class="text-blue-600">{{ activity.contact }}</a>{% else %}-{% endif %}</div>
+            <div><span class="text-gray-500">Empresa:</span> {% if activity.company %}<a href="{% url 'contacts:company_detail' activity.company.pk %}" class="text-blue-600">{{ activity.company }}</a>{% else %}-{% endif %}</div>
+            <div><span class="text-gray-500">Asignado:</span> {{ activity.assigned_to|default:"-" }}</div>
+        </div>
+        {% if activity.description %}<div class="pt-4 border-t"><p class="text-sm text-gray-700">{{ activity.description }}</p></div>{% endif %}
+        {% if not activity.is_completed %}
+        <div class="pt-4 border-t">
+            <form method="post" action="{% url 'activities:activity_complete' activity.pk %}">{% csrf_token %}<button type="submit" class="btn-primary">Marcar como completada</button></form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

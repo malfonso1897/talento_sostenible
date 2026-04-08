@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}{{ company.name }} - {{ crm_name }}{% endblock %}
+{% block page_title %}{{ company.name }}{% endblock %}
+{% block page_actions %}<a href="{% url 'contacts:company_edit' company.pk %}" class="btn-secondary">Editar</a>{% endblock %}
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 space-y-6">
+        <div class="bg-white rounded-xl shadow-sm border p-6">
+            <h3 class="font-semibold text-gray-800 mb-4">Información de la empresa</h3>
+            <div class="grid grid-cols-2 gap-4 text-sm">
+                <div><span class="text-gray-500">Sector:</span> <span class="font-medium">{{ company.get_industry_display|default:"-" }}</span></div>
+                <div><span class="text-gray-500">Tamaño:</span> <span class="font-medium">{{ company.get_size_display|default:"-" }}</span></div>
+                <div><span class="text-gray-500">Web:</span> {% if company.website %}<a href="{{ company.website }}" class="text-blue-600" target="_blank">{{ company.website }}</a>{% else %}-{% endif %}</div>
+                <div><span class="text-gray-500">Teléfono:</span> <span class="font-medium">{{ company.phone|default:"-" }}</span></div>
+                <div><span class="text-gray-500">Ciudad:</span> <span class="font-medium">{{ company.city|default:"-" }}</span></div>
+                <div><span class="text-gray-500">País:</span> <span class="font-medium">{{ company.country|default:"-" }}</span></div>
+                <div><span class="text-gray-500">Facturación:</span> <span class="font-medium">{% if company.annual_revenue %}{{ company.annual_revenue|floatformat:0 }}€{% else %}-{% endif %}</span></div>
+            </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm border">
+            <div class="p-4 border-b"><h3 class="font-semibold text-gray-800">Contactos ({{ contacts.count }})</h3></div>
+            <div class="divide-y">
+                {% for contact in contacts %}
+                <a href="{% url 'contacts:contact_detail' contact.pk %}" class="block p-4 hover:bg-gray-50">
+                    <p class="font-medium text-sm">{{ contact.full_name }}</p>
+                    <p class="text-xs text-gray-400">{{ contact.job_title|default:"" }} · {{ contact.email }}</p>
+                </a>
+                {% empty %}<p class="p-4 text-sm text-gray-400">Sin contactos.</p>{% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="space-y-6">
+        <div class="bg-white rounded-xl shadow-sm border">
+            <div class="p-4 border-b"><h3 class="font-semibold text-gray-800">Oportunidades</h3></div>
+            <div class="divide-y">
+                {% for opp in opportunities %}
+                <a href="{% url 'opportunities:opportunity_detail' opp.pk %}" class="block p-3 hover:bg-gray-50">
+                    <p class="text-sm font-medium text-blue-600">{{ opp.name }}</p>
+                    <p class="text-xs text-gray-400">{{ opp.get_stage_display }} · {{ opp.amount|floatformat:0 }}€</p>
+                </a>
+                {% empty %}<p class="p-3 text-sm text-gray-400">Sin oportunidades.</p>{% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

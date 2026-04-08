@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Calendario - {{ crm_name }}{% endblock %}
+{% block page_title %}Calendario de Actividades{% endblock %}
+{% block page_actions %}<a href="{% url 'activities:activity_create' %}" class="btn-primary">+ Nueva Actividad</a>{% endblock %}
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="bg-white rounded-xl shadow-sm border">
+        <div class="p-4 border-b"><h3 class="font-semibold text-gray-800">Hoy</h3></div>
+        <div class="divide-y">
+            {% for act in today_activities %}
+            <a href="{% url 'activities:activity_detail' act.pk %}" class="block p-4 hover:bg-gray-50">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium">{{ act.subject }}</p>
+                        <p class="text-xs text-gray-400">{{ act.get_activity_type_display }} · {{ act.due_date|date:"H:i" }}</p>
+                    </div>
+                    {% if act.is_completed %}<span class="badge bg-green-100 text-green-700 text-xs">Si</span>{% endif %}
+                </div>
+            </a>
+            {% empty %}<p class="p-4 text-sm text-gray-400">Sin actividades para hoy.</p>{% endfor %}
+        </div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border">
+        <div class="p-4 border-b"><h3 class="font-semibold text-gray-800">Próximos 7 días</h3></div>
+        <div class="divide-y">
+            {% for act in upcoming_activities %}
+            <a href="{% url 'activities:activity_detail' act.pk %}" class="block p-4 hover:bg-gray-50">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium">{{ act.subject }}</p>
+                        <p class="text-xs text-gray-400">{{ act.get_activity_type_display }} · {{ act.due_date|date:"d/m H:i" }}</p>
+                    </div>
+                </div>
+            </a>
+            {% empty %}<p class="p-4 text-sm text-gray-400">Sin actividades próximas.</p>{% endfor %}
+        </div>
+    </div>
+</div>
+<div class="mt-6 bg-white rounded-xl shadow-sm border">
+    <div class="p-4 border-b"><h3 class="font-semibold text-gray-800">Atrasadas</h3></div>
+    <div class="divide-y">
+        {% for act in overdue_activities %}
+        <a href="{% url 'activities:activity_detail' act.pk %}" class="block p-4 hover:bg-red-50">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-red-600">{{ act.subject }}</p>
+                    <p class="text-xs text-red-400">{{ act.get_activity_type_display }} · {{ act.due_date|date:"d/m/Y H:i" }}</p>
+                </div>
+            </div>
+        </a>
+        {% empty %}<p class="p-4 text-sm text-gray-400">Sin actividades atrasadas.</p>{% endfor %}
+    </div>
+</div>
+{% endblock %}

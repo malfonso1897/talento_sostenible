@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Forecast - {{ crm_name }}{% endblock %}
+{% block page_title %}Forecast de Ventas{% endblock %}
+{% block content %}
+<div class="grid grid-cols-2 gap-4 mb-8">
+    <div class="bg-white rounded-xl shadow-sm border p-4">
+        <p class="text-xs text-gray-500 uppercase">Pipeline ponderado</p>
+        <p class="text-2xl font-bold text-indigo-600">{{ weighted_total|floatformat:0 }}€</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border p-4">
+        <p class="text-xs text-gray-500 uppercase">Pipeline total</p>
+        <p class="text-2xl font-bold text-gray-800">{{ pipeline_total|floatformat:0 }}€</p>
+    </div>
+</div>
+<div class="bg-white rounded-xl shadow-sm border">
+    <div class="p-4 border-b"><h3 class="font-semibold text-gray-800">Oportunidades abiertas</h3></div>
+    <table class="w-full">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Etapa</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Importe</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Probabilidad</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ponderado</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cierre esperado</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y">
+            {% for opp in opportunities %}
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3"><a href="{% url 'opportunities:opportunity_detail' opp.pk %}" class="text-blue-600 hover:underline text-sm font-medium">{{ opp.name }}</a></td>
+                <td class="px-4 py-3 text-sm">{{ opp.get_stage_display }}</td>
+                <td class="px-4 py-3 text-sm">{{ opp.amount|floatformat:0 }}€</td>
+                <td class="px-4 py-3 text-sm">{{ opp.probability }}%</td>
+                <td class="px-4 py-3 text-sm font-medium text-green-700">{{ opp.weighted_value|floatformat:0 }}€</td>
+                <td class="px-4 py-3 text-sm text-gray-600">{{ opp.expected_close_date|date:"d/m/Y"|default:"-" }}</td>
+            </tr>
+            {% empty %}<tr><td colspan="6" class="px-4 py-4 text-center text-gray-400">Sin oportunidades abiertas.</td></tr>{% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

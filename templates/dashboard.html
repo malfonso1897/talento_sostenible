@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - {{ crm_name }}{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- KPIs -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-xl shadow-sm p-6 border">
+        <p class="text-sm text-gray-500">Contactos</p>
+        <p class="text-3xl font-bold text-gray-900 mt-1">{{ total_contacts }}</p>
+        <p class="text-xs text-gray-400 mt-1">{{ total_companies }} empresas</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-6 border">
+        <p class="text-sm text-gray-500">Leads este mes</p>
+        <p class="text-3xl font-bold text-blue-600 mt-1">{{ new_leads_month }}</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-6 border">
+        <p class="text-sm text-gray-500">Oportunidades abiertas</p>
+        <p class="text-3xl font-bold text-green-600 mt-1">{{ open_opportunities }}</p>
+        <p class="text-xs text-gray-400 mt-1">{{ pipeline_value|floatformat:0 }}€ en pipeline</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-6 border">
+        <p class="text-sm text-gray-500">Ganadas este mes</p>
+        <p class="text-3xl font-bold text-emerald-600 mt-1">{{ won_this_month }}</p>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-xl shadow-sm p-6 border">
+        <p class="text-sm text-gray-500">Actividades hoy</p>
+        <p class="text-3xl font-bold text-orange-600 mt-1">{{ today_activities }}</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-6 border">
+        <p class="text-sm text-gray-500">Tickets abiertos</p>
+        <p class="text-3xl font-bold text-red-600 mt-1">{{ open_tickets }}</p>
+    </div>
+</div>
+
+<!-- Actividades próximas y leads recientes -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Próximas actividades -->
+    <div class="bg-white rounded-xl shadow-sm border">
+        <div class="p-4 border-b flex justify-between items-center">
+            <h3 class="font-semibold text-gray-800">Próximas actividades</h3>
+            <a href="{% url 'activities:activity_list' %}" class="text-sm text-blue-600 hover:underline">Ver todas</a>
+        </div>
+        <div class="divide-y">
+            {% for activity in upcoming_activities %}
+            <div class="p-4 hover:bg-gray-50">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="font-medium text-gray-800">
+                            {% if activity.activity_type == "call" %}Llamada{% elif activity.activity_type == "email" %}Email{% elif activity.activity_type == "meeting" %}Reunion{% else %}Tarea{% endif %} -
+                            {{ activity.subject }}
+                        </p>
+                        {% if activity.contact %}
+                        <p class="text-sm text-gray-500">{{ activity.contact.full_name }}</p>
+                        {% endif %}
+                    </div>
+                    <span class="text-xs text-gray-400">{{ activity.due_date|date:"d M H:i" }}</span>
+                </div>
+            </div>
+            {% empty %}
+            <p class="p-4 text-gray-400 text-sm">No hay actividades pendientes.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Leads recientes -->
+    <div class="bg-white rounded-xl shadow-sm border">
+        <div class="p-4 border-b flex justify-between items-center">
+            <h3 class="font-semibold text-gray-800">Leads recientes</h3>
+            <a href="{% url 'leads:lead_list' %}" class="text-sm text-blue-600 hover:underline">Ver todos</a>
+        </div>
+        <div class="divide-y">
+            {% for lead in recent_leads %}
+            <a href="{% url 'leads:lead_detail' lead.pk %}" class="block p-4 hover:bg-gray-50">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="font-medium text-gray-800">{{ lead.full_name }}</p>
+                        <p class="text-sm text-gray-500">{{ lead.company_name }}</p>
+                    </div>
+                    <span class="badge {% if lead.status == 'new' %}bg-blue-100 text-blue-800{% elif lead.status == 'qualified' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                        {{ lead.get_status_display }}
+                    </span>
+                </div>
+            </a>
+            {% empty %}
+            <p class="p-4 text-gray-400 text-sm">No hay leads recientes.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Oportunidades recientes -->
+<div class="mt-6 bg-white rounded-xl shadow-sm border">
+    <div class="p-4 border-b flex justify-between items-center">
+        <h3 class="font-semibold text-gray-800">Oportunidades recientes</h3>
+        <a href="{% url 'opportunities:pipeline' %}" class="text-sm text-blue-600 hover:underline">Ver pipeline</a>
+    </div>
+    <table class="w-full">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Oportunidad</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Empresa</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Etapa</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Valor</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y">
+            {% for opp in recent_opportunities %}
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3">
+                    <a href="{% url 'opportunities:opportunity_detail' opp.pk %}" class="text-blue-600 hover:underline">{{ opp.name }}</a>
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-500">{{ opp.company.name|default:"-" }}</td>
+                <td class="px-4 py-3">
+                    <span class="badge
+                        {% if opp.stage == 'prospecting' %}bg-gray-100 text-gray-700
+                        {% elif opp.stage == 'qualification' %}bg-blue-100 text-blue-700
+                        {% elif opp.stage == 'proposal' %}bg-yellow-100 text-yellow-700
+                        {% elif opp.stage == 'negotiation' %}bg-purple-100 text-purple-700
+                        {% elif opp.stage == 'closed_won' %}bg-green-100 text-green-700
+                        {% else %}bg-red-100 text-red-700{% endif %}">
+                        {{ opp.get_stage_display }}
+                    </span>
+                </td>
+                <td class="px-4 py-3 text-right font-medium">{{ opp.amount|floatformat:0 }}€</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="px-4 py-3 text-gray-400 text-sm">No hay oportunidades recientes.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

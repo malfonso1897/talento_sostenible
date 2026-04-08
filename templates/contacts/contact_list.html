@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Contactos - {{ crm_name }}{% endblock %}
+{% block page_title %}Contactos{% endblock %}
+{% block page_actions %}
+<a href="{% url 'contacts:contact_create' %}" class="btn-primary">+ Nuevo Contacto</a>
+{% endblock %}
+
+{% block content %}
+<!-- Filtros -->
+<div class="bg-white rounded-xl shadow-sm border p-4 mb-6">
+    <form method="get" class="flex flex-wrap gap-4 items-end">
+        <div class="flex-1 min-w-[200px]">
+            <label class="block text-xs font-medium text-gray-500 mb-1">Buscar</label>
+            <input type="search" name="q" value="{{ search }}" placeholder="Nombre, email, teléfono..."
+                   class="form-input" hx-get="{% url 'contacts:contact_list' %}" hx-trigger="keyup changed delay:300ms" hx-target="#contact-table">
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Estado</label>
+            <select name="status" class="form-input" onchange="this.form.submit()">
+                <option value="">Todos</option>
+                {% for value, label in status_choices %}
+                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+</div>
+
+<!-- Tabla -->
+<div id="contact-table" class="bg-white rounded-xl shadow-sm border overflow-hidden">
+    <table class="w-full">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Empresa</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Asignado a</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y">
+            {% for contact in contacts %}
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3">
+                    <a href="{% url 'contacts:contact_detail' contact.pk %}" class="text-blue-600 hover:underline font-medium">
+                        {{ contact.full_name }}
+                    </a>
+                    {% if contact.job_title %}<p class="text-xs text-gray-400">{{ contact.job_title }}</p>{% endif %}
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-600">{{ contact.email }}</td>
+                <td class="px-4 py-3 text-sm text-gray-600">{{ contact.company.name|default:"-" }}</td>
+                <td class="px-4 py-3">
+                    <span class="badge {% if contact.status == 'active' %}bg-green-100 text-green-700{% elif contact.status == 'customer' %}bg-blue-100 text-blue-700{% elif contact.status == 'prospect' %}bg-yellow-100 text-yellow-700{% else %}bg-gray-100 text-gray-700{% endif %}">
+                        {{ contact.get_status_display }}
+                    </span>
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-600">{{ contact.assigned_to|default:"-" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="px-4 py-8 text-center text-gray-400">No se encontraron contactos.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if contacts.has_other_pages %}
+    <div class="px-4 py-3 border-t flex justify-between items-center">
+        <span class="text-sm text-gray-500">Página {{ contacts.number }} de {{ contacts.paginator.num_pages }}</span>
+        <div class="space-x-2">
+            {% if contacts.has_previous %}
+            <a href="?page={{ contacts.previous_page_number }}&q={{ search }}" class="btn-secondary text-sm">Anterior</a>
+            {% endif %}
+            {% if contacts.has_next %}
+            <a href="?page={{ contacts.next_page_number }}&q={{ search }}" class="btn-secondary text-sm">Siguiente</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

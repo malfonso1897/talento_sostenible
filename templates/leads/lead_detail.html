@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ lead.full_name }} - {{ crm_name }}{% endblock %}
+{% block page_title %}Lead: {{ lead.full_name }}{% endblock %}
+{% block page_actions %}
+<a href="{% url 'leads:lead_edit' lead.pk %}" class="btn-secondary">Editar</a>
+{% if lead.status != "converted" %}
+<a href="{% url 'leads:lead_convert' lead.pk %}" class="btn-primary">Convertir</a>
+{% endif %}
+{% endblock %}
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 space-y-6">
+        <div class="bg-white rounded-xl shadow-sm border p-6">
+            <div class="grid grid-cols-2 gap-4 text-sm">
+                <div><span class="text-gray-500">Email:</span> <span class="font-medium">{{ lead.email }}</span></div>
+                <div><span class="text-gray-500">Teléfono:</span> <span class="font-medium">{{ lead.phone|default:"-" }}</span></div>
+                <div><span class="text-gray-500">Empresa:</span> <span class="font-medium">{{ lead.company_name|default:"-" }}</span></div>
+                <div><span class="text-gray-500">Cargo:</span> <span class="font-medium">{{ lead.job_title|default:"-" }}</span></div>
+                <div><span class="text-gray-500">Origen:</span> <span class="font-medium">{{ lead.get_source_display|default:"-" }}</span></div>
+                <div><span class="text-gray-500">Prioridad:</span> <span class="font-medium">{{ lead.get_priority_display }}</span></div>
+                <div><span class="text-gray-500">Score:</span> <span class="font-bold text-lg {% if lead.score >= 70 %}text-green-600{% elif lead.score >= 40 %}text-yellow-600{% else %}text-red-600{% endif %}">{{ lead.score }}/100</span></div>
+                <div><span class="text-gray-500">Estado:</span> <span class="badge {% if lead.status == 'qualified' %}bg-green-100 text-green-700{% elif lead.status == 'new' %}bg-blue-100 text-blue-700{% else %}bg-gray-100 text-gray-700{% endif %}">{{ lead.get_status_display }}</span></div>
+            </div>
+            {% if lead.description %}<div class="mt-4 pt-4 border-t"><p class="text-sm text-gray-700">{{ lead.description }}</p></div>{% endif %}
+        </div>
+        <div class="bg-white rounded-xl shadow-sm border">
+            <div class="p-4 border-b"><h3 class="font-semibold text-gray-800">Actividades</h3></div>
+            <div class="divide-y">
+                {% for activity in activities %}
+                <div class="p-4"><p class="text-sm font-medium">{{ activity.subject }}</p><p class="text-xs text-gray-400">{{ activity.due_date|date:"d/m/Y H:i" }}</p></div>
+                {% empty %}<p class="p-4 text-sm text-gray-400">Sin actividades.</p>{% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border p-4 text-xs text-gray-400 space-y-1">
+        <p>Creado: {{ lead.created_at|date:"d/m/Y H:i" }}</p>
+        <p>Asignado a: {{ lead.assigned_to|default:"Sin asignar" }}</p>
+        {% if lead.campaign %}<p>Campaña: {{ lead.campaign.name }}</p>{% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Tickets - {{ crm_name }}{% endblock %}
+{% block page_title %}Soporte - Tickets{% endblock %}
+{% block page_actions %}<a href="{% url 'tickets:ticket_create' %}" class="btn-primary">+ Nuevo Ticket</a>{% endblock %}
+{% block content %}
+<div class="bg-white rounded-xl shadow-sm border p-4 mb-6">
+    <form method="get" class="flex flex-wrap gap-4 items-end">
+        <select name="status" class="form-input w-auto" onchange="this.form.submit()">
+            <option value="">Todos</option>
+            {% for value, label in status_choices %}
+            <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <select name="priority" class="form-input w-auto" onchange="this.form.submit()">
+            <option value="">Todas las prioridades</option>
+            {% for value, label in priority_choices %}
+            <option value="{{ value }}" {% if request.GET.priority == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+<div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+    <table class="w-full">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Asunto</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contacto</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prioridad</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">SLA</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Asignado</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y">
+            {% for ticket in tickets %}
+            <tr class="hover:bg-gray-50 {% if ticket.is_overdue %}bg-red-50{% endif %}">
+                <td class="px-4 py-3"><a href="{% url 'tickets:ticket_detail' ticket.pk %}" class="text-blue-600 hover:underline font-medium">{{ ticket.subject }}</a></td>
+                <td class="px-4 py-3 text-sm text-gray-600">{{ ticket.contact|default:"-" }}</td>
+                <td class="px-4 py-3"><span class="badge {% if ticket.status == 'open' %}bg-blue-100 text-blue-700{% elif ticket.status == 'in_progress' %}bg-yellow-100 text-yellow-700{% elif ticket.status == 'resolved' %}bg-green-100 text-green-700{% elif ticket.status == 'closed' %}bg-gray-100 text-gray-700{% else %}bg-orange-100 text-orange-700{% endif %}">{{ ticket.get_status_display }}</span></td>
+                <td class="px-4 py-3"><span class="badge {% if ticket.priority == 'critical' %}bg-red-100 text-red-700{% elif ticket.priority == 'high' %}bg-orange-100 text-orange-700{% elif ticket.priority == 'medium' %}bg-yellow-100 text-yellow-700{% else %}bg-gray-100 text-gray-700{% endif %}">{{ ticket.get_priority_display }}</span></td>
+                <td class="px-4 py-3 text-sm {% if ticket.is_overdue %}text-red-600 font-medium{% else %}text-gray-600{% endif %}">{% if ticket.is_overdue %}Vencido{% elif ticket.sla_deadline %}{{ ticket.sla_deadline|date:"d/m H:i" }}{% else %}-{% endif %}</td>
+                <td class="px-4 py-3 text-sm text-gray-600">{{ ticket.assigned_to|default:"-" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="px-4 py-8 text-center text-gray-400">No hay tickets.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
